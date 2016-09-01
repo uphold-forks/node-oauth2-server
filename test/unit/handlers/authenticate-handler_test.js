@@ -93,19 +93,19 @@ describe('AuthenticateHandler', function() {
     });
   });
 
-  describe('verifyScope()', function() {
+  describe('validateScope()', function() {
     it('should call `model.getAccessToken()` if scope is defined', function() {
       var model = {
         getAccessToken: function() {},
-        verifyScope: sinon.stub().returns(true)
+        validateScope: sinon.stub().returns(true)
       };
       var handler = new AuthenticateHandler({ addAcceptedScopesHeader: true, addAuthorizedScopesHeader: true, model: model, scope: 'bar' });
 
-      return handler.verifyScope('foo')
+      return handler.validateScope('foo')
         .then(function() {
-          model.verifyScope.callCount.should.equal(1);
-          model.verifyScope.firstCall.args.should.have.length(2);
-          model.verifyScope.firstCall.args[0].should.equal('foo', 'bar');
+          model.validateScope.callCount.should.equal(1);
+          model.validateScope.firstCall.args.should.have.length(2);
+          model.validateScope.firstCall.args[0].should.equal('foo', 'bar');
         })
         .catch(should.fail);
     });

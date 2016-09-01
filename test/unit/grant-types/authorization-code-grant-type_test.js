@@ -67,7 +67,6 @@ describe('AuthorizationCodeGrantType', function() {
       };
       var handler = new AuthorizationCodeGrantType({ accessTokenLifetime: 120, model: model });
 
-      sinon.stub(handler, 'validateScope').returns('foobiz');
       sinon.stub(handler, 'generateAccessToken').returns(Promise.resolve('foo'));
       sinon.stub(handler, 'generateRefreshToken').returns(Promise.resolve('bar'));
 

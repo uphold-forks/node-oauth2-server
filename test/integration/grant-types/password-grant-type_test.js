@@ -96,11 +96,10 @@ describe('PasswordGrantType integration', function() {
       var token = {};
       var model = {
         getUser: function() { return {}; },
-        saveToken: function() { return token; },
-        validateScope: function() { return 'baz'; }
+        saveToken: function() { return token; }
       };
       var grantType = new PasswordGrantType({ accessTokenLifetime: 123, model: model });
-      var request = new Request({ body: { username: 'foo', password: 'bar', scope: 'baz' }, headers: {}, method: {}, query: {} });
+      var request = new Request({ body: { username: 'foo', password: 'bar' }, headers: {}, method: {}, query: {} });
 
       return grantType.handle(request, client)
         .then(function(data) {
@@ -271,8 +270,7 @@ describe('PasswordGrantType integration', function() {
       var token = {};
       var model = {
         getUser: function() {},
-        saveToken: function() { return token; },
-        validateScope: function() { return 'foo'; }
+        saveToken: function() { return token; }
       };
       var grantType = new PasswordGrantType({ accessTokenLifetime: 123, model: model });
 
