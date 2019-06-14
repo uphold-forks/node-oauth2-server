@@ -44,6 +44,12 @@ describe('AbstractGrantType integration', function() {
       grantType.accessTokenLifetime.should.equal(123);
     });
 
+    it('should accept `accessTokenLifetime` as `null`', function() {
+      var grantType = new AbstractGrantType({ accessTokenLifetime: null, model: {} });
+
+      should.equal(grantType.accessTokenLifetime, null);
+    });
+
     it('should set the `model`', function() {
       var model = {};
       var grantType = new AbstractGrantType({ accessTokenLifetime: 123, model: model });
@@ -127,6 +133,12 @@ describe('AbstractGrantType integration', function() {
   });
 
   describe('getAccessTokenExpiresAt()', function() {
+    it('should return `null` is `accessTokenLifetime` is `null`', function() {
+      var handler = new AbstractGrantType({ accessTokenLifetime: null, model: {}, refreshTokenLifetime: 456 });
+
+      should.equal(handler.getAccessTokenExpiresAt(), null);
+    });
+
     it('should return a date', function() {
       var handler = new AbstractGrantType({ accessTokenLifetime: 123, model: {}, refreshTokenLifetime: 456 });
 
@@ -135,6 +147,12 @@ describe('AbstractGrantType integration', function() {
   });
 
   describe('getRefreshTokenExpiresAt()', function() {
+    it('should return `null` is `refreshTokenLifetime` is `null`', function () {
+      var handler = new AbstractGrantType({ accessTokenLifetime: 123, model: {}, refreshTokenLifetime: null });
+
+      should.equal(handler.getRefreshTokenExpiresAt(), null);
+    });
+
     it('should return a refresh token', function() {
       var handler = new AbstractGrantType({ accessTokenLifetime: 123, model: {}, refreshTokenLifetime: 456 });
 

@@ -71,6 +71,16 @@ describe('TokenHandler integration', function() {
       }
     });
 
+    it('should accept `accessTokenLifetime` as `null`', function () {
+      var model = {
+        getClient: function () { },
+        saveToken: function () { }
+      };
+      var grantType = new TokenHandler({ accessTokenLifetime: null, model: model, refreshTokenLifetime: 120 });
+
+      should.equal(grantType.accessTokenLifetime, null);
+    });
+
     it('should set the `accessTokenLifetime`', function() {
       var accessTokenLifetime = {};
       var model = {
@@ -101,6 +111,16 @@ describe('TokenHandler integration', function() {
       var handler = new TokenHandler({ accessTokenLifetime: 120, model: model, refreshTokenLifetime: 120 });
 
       handler.model.should.equal(model);
+    });
+
+    it('should accept `refreshTokenLifetime` as `null`', function () {
+      var model = {
+        getClient: function () { },
+        saveToken: function () { }
+      };
+      var grantType = new TokenHandler({ accessTokenLifetime: 120, model: model, refreshTokenLifetime: null });
+
+      should.equal(grantType.refreshTokenLifetime, null);
     });
 
     it('should set the `refreshTokenLifetime`', function() {
@@ -747,15 +767,21 @@ describe('TokenHandler integration', function() {
   });
 
   describe('getAccessTokenLifetime()', function() {
-    it('should return the client access token lifetime', function() {
-      var client = { accessTokenLifetime: 60 };
+    it('should return the model access token lifetime', function() {
+      var client = {};
       var model = {
+        getAccessTokenLifetime: function () { return Promise.resolve(60); },
         getClient: function() { return client; },
         saveToken: function() {}
       };
       var handler = new TokenHandler({ accessTokenLifetime: 120, model: model, refreshTokenLifetime: 120 });
 
-      handler.getAccessTokenLifetime(client).should.equal(60);
+
+      return handler.getAccessTokenLifetime(client)
+        .then(function (value) {
+          value.should.equal(60);
+        })
+        .catch(should.fail);
     });
 
     it('should return the default access token lifetime', function() {
@@ -771,18 +797,24 @@ describe('TokenHandler integration', function() {
   });
 
   describe('getRefreshTokenLifetime()', function() {
-    it('should return the client access token lifetime', function() {
-      var client = { refreshTokenLifetime: 60 };
+    it('should return the model refresh token lifetime', function() {
+      var client = {};
       var model = {
-        getClient: function() { return client; },
-        saveToken: function() {}
+        getClient: function () { return client; },
+        getRefreshTokenLifetime: function () { return Promise.resolve(60); },
+        saveToken: function () { }
       };
       var handler = new TokenHandler({ accessTokenLifetime: 120, model: model, refreshTokenLifetime: 120 });
 
-      handler.getRefreshTokenLifetime(client).should.equal(60);
+
+      return handler.getRefreshTokenLifetime(client)
+        .then(function (value) {
+          value.should.equal(60);
+        })
+        .catch(should.fail);
     });
 
-    it('should return the default access token lifetime', function() {
+    it('should return the default refresh token lifetime', function() {
       var client = {};
       var model = {
         getClient: function() { return client; },
