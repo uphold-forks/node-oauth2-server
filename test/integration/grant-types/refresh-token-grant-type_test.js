@@ -416,7 +416,7 @@ describe('RefreshTokenGrantType integration', function() {
 
       grantType.revokeToken({})
         .then(should.fail)
-        .catch(function (e) {
+        .catch(function(e) {
           e.should.be.an.instanceOf(InvalidGrantError);
           e.message.should.equal('Invalid grant: refresh token is invalid');
         });
@@ -432,7 +432,7 @@ describe('RefreshTokenGrantType integration', function() {
 
       grantType.revokeToken({})
         .then(should.fail)
-        .catch(function (e) {
+        .catch(function(e) {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal('Server error: `refreshTokenExpiresAt` must be a Date instance');
         });
@@ -448,7 +448,7 @@ describe('RefreshTokenGrantType integration', function() {
 
       grantType.revokeToken({})
         .then(should.fail)
-        .catch(function (e) {
+        .catch(function(e) {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal('Server error: refresh token should be expired');
         });

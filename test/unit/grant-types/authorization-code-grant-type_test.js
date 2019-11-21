@@ -61,8 +61,8 @@ describe('AuthorizationCodeGrantType', function() {
       var client = {};
       var user = {};
       var model = {
-        getAuthorizationCode: function () { },
-        revokeAuthorizationCode: function () { },
+        getAuthorizationCode: function() {},
+        revokeAuthorizationCode: function() {},
         saveToken: sinon.stub().returns(true)
       };
       var handler = new AuthorizationCodeGrantType({ accessTokenLifetime: 120, model: model });
@@ -73,7 +73,7 @@ describe('AuthorizationCodeGrantType', function() {
       sinon.stub(handler, 'getRefreshTokenExpiresAt').returns('baz');
 
       return handler.saveToken(user, client, 'foobar', 'foobiz')
-        .then(function () {
+        .then(function() {
           model.saveToken.callCount.should.equal(1);
           model.saveToken.firstCall.args.should.have.length(3);
           model.saveToken.firstCall.args[0].should.eql({ accessToken: 'foo', accessTokenExpiresAt: 'biz', authorizationCode: 'foobar', refreshToken: 'bar', refreshTokenExpiresAt: 'baz', scope: 'foobiz' });

@@ -93,6 +93,23 @@ describe('AuthorizationCodeGrantType integration', function() {
     });
 
     it('should throw an error if `client` is missing', function() {
+      var model = {
+        getAuthorizationCode: function() { return { authorizationCode: 12345, expiresAt: new Date(new Date() * 2), user: {} }; },
+        revokeAuthorizationCode: function() {},
+        saveToken: function() {}
+      };
+      var grantType = new AuthorizationCodeGrantType({ accessTokenLifetime: 123, model: model });
+      var request = new Request({ body: { code: 12345 }, headers: {}, method: {}, query: {} });
+
+      try {
+        grantType.handle(request, null);
+      } catch (e) {
+        e.should.be.an.instanceOf(InvalidArgumentError);
+        e.message.should.equal('Missing parameter: `client`');
+      }
+    });
+
+    it('should throw an error if `client` is invalid', function() {
       var client = {};
       var model = {
         getAuthorizationCode: function() { return { authorizationCode: 12345, expiresAt: new Date(new Date() * 2), user: {} }; },

@@ -147,7 +147,7 @@ describe('AbstractGrantType integration', function() {
   });
 
   describe('getRefreshTokenExpiresAt()', function() {
-    it('should return `null` is `refreshTokenLifetime` is `null`', function () {
+    it('should return `null` is `refreshTokenLifetime` is `null`', function() {
       var handler = new AbstractGrantType({ accessTokenLifetime: 123, model: {}, refreshTokenLifetime: null });
 
       should.equal(handler.getRefreshTokenExpiresAt(), null);
