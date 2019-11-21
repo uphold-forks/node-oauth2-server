@@ -98,7 +98,7 @@ describe('Server integration', function() {
         }
       };
       var server = new Server({ model: model });
-      var request = new Request({ body: { client_id: 1234, client_secret: 'secret', response_type: 'code' }, headers: { 'Authorization': 'Bearer foo' }, method: {}, query: { state: 'foobar' } });
+      var request = new Request({ body: { client_id: 1234, client_secret: 'secret', grant_type: 'authorization_code', response_type: 'code' }, headers: { 'Authorization': 'Bearer foo' }, method: {}, query: { state: 'foobar' } });
       var response = new Response({ body: {}, headers: {} });
 
       return server.authorize(request, response)
@@ -122,7 +122,7 @@ describe('Server integration', function() {
         }
       };
       var server = new Server({ model: model });
-      var request = new Request({ body: { client_id: 1234, client_secret: 'secret', response_type: 'code' }, headers: { 'Authorization': 'Bearer foo' }, method: {}, query: { state: 'foobar' } });
+      var request = new Request({ body: { client_id: 1234, client_secret: 'secret', grant_type: 'authorization_code', response_type: 'code' }, headers: { 'Authorization': 'Bearer foo' }, method: {}, query: { state: 'foobar' } });
       var response = new Response({ body: {}, headers: {} });
       var handler = server.authorize(request, response);
 
@@ -142,7 +142,7 @@ describe('Server integration', function() {
         }
       };
       var server = new Server({ model: model });
-      var request = new Request({ body: { client_id: 1234, client_secret: 'secret', response_type: 'code' }, headers: { 'Authorization': 'Bearer foo' }, method: {}, query: { state: 'foobar' } });
+      var request = new Request({ body: { client_id: 1234, client_secret: 'secret', grant_type: 'authorization_code', response_type: 'code' }, headers: { 'Authorization': 'Bearer foo' }, method: {}, query: { state: 'foobar' } });
       var response = new Response({ body: {}, headers: {} });
 
       server.authorize(request, response, null, next);
