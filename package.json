@@ -28,7 +28,7 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "engines": {
-    "node": ">=0.8"
+    "node": ">=4.0"
   },
   "scripts": {
     "pretest": "./node_modules/.bin/jshint --config ./.jshintrc lib test",
