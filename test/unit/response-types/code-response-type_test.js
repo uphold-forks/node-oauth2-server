@@ -5,7 +5,6 @@
  */
 
 var CodeResponseType = require('../../../lib/response-types/code-response-type');
-var should = require('should');
 var sinon = require('sinon');
 
 /**
