@@ -5,6 +5,7 @@
  */
 
 var ClientCredentialsGrantType = require('../../../lib/grant-types/client-credentials-grant-type');
+var Request = require('../../../lib/request');
 var sinon = require('sinon');
 var should = require('should');
 
@@ -20,13 +21,15 @@ describe('ClientCredentialsGrantType', function() {
         saveToken: function() {}
       };
       var handler = new ClientCredentialsGrantType({ accessTokenLifetime: 120, model: model });
+      var request = new Request({ body: {}, headers: {}, method: {}, query: {} });
       var client = {};
 
-      return handler.getUserFromClient(client)
+      return handler.getUserFromClient(request, client)
         .then(function() {
           model.getUserFromClient.callCount.should.equal(1);
-          model.getUserFromClient.firstCall.args.should.have.length(1);
+          model.getUserFromClient.firstCall.args.should.have.length(2);
           model.getUserFromClient.firstCall.args[0].should.equal(client);
+          model.getUserFromClient.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
     });
@@ -41,17 +44,19 @@ describe('ClientCredentialsGrantType', function() {
         saveToken: sinon.stub().returns(true)
       };
       var handler = new ClientCredentialsGrantType({ accessTokenLifetime: 120, model: model });
+      var request = new Request({ body: {}, headers: {}, method: {}, query: {} });
 
       sinon.stub(handler, 'generateAccessToken').returns('foo');
       sinon.stub(handler, 'getAccessTokenExpiresAt').returns('biz');
 
-      return handler.saveToken(user, client, 'foobar')
+      return handler.saveToken(request, user, client, 'foobar')
         .then(function() {
           model.saveToken.callCount.should.equal(1);
-          model.saveToken.firstCall.args.should.have.length(3);
+          model.saveToken.firstCall.args.should.have.length(4);
           model.saveToken.firstCall.args[0].should.eql({ accessToken: 'foo', accessTokenExpiresAt: 'biz', grant: 'client_credentials', scope: 'foobar' });
           model.saveToken.firstCall.args[1].should.equal(client);
           model.saveToken.firstCall.args[2].should.equal(user);
+          model.saveToken.firstCall.args[3].should.eql({ request });
         })
         .catch(should.fail);
     });
