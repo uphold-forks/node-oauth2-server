@@ -5,6 +5,7 @@
  */
 
 var CodeResponseType = require('../../../lib/response-types/code-response-type');
+var Request = require('../../../lib/request');
 var sinon = require('sinon');
 
 /**
@@ -19,10 +20,12 @@ describe('CodeResponseType', function() {
         saveAuthorizationCode: function() {}
       };
       var handler = new CodeResponseType({ authorizationCodeLifetime: 120, model: model });
+      var request = new Request({ body: { scope: 'foo' }, headers: {}, method: {}, query: {} });
 
-      return handler.generateAuthorizationCode()
+      return handler.generateAuthorizationCode(request)
         .then(function() {
           model.generateAuthorizationCode.callCount.should.equal(1);
+          model.generateAuthorizationCode.firstCall.args[0].should.eql({ request });
         });
     });
   });
@@ -33,6 +36,7 @@ describe('CodeResponseType', function() {
       var client = { grants: ['authorization_code'], redirectUris: ['http://example.com/cb'] };
       var expiresAt = new Date();
       var redirectUri = 'http://example.com/cb';
+      var request = new Request({ body: { scope: 'foo' }, headers: {}, method: {}, query: {} });
       var scope = 'foobar';
       var user = {};
       var model = {
@@ -44,15 +48,16 @@ describe('CodeResponseType', function() {
 
       expiresAt.setSeconds(expiresAt.getSeconds() + 120);
 
-      return handler.saveAuthorizationCode(authorizationCode, expiresAt, scope, client, redirectUri, user)
+      return handler.saveAuthorizationCode(request, authorizationCode, expiresAt, scope, client, redirectUri, user)
         .then(function() {
           model.saveAuthorizationCode.callCount.should.equal(1);
-          model.saveAuthorizationCode.firstCall.args.should.have.length(3);
+          model.saveAuthorizationCode.firstCall.args.should.have.length(4);
           model.saveAuthorizationCode.firstCall.args[0].should.eql({
             authorizationCode, expiresAt, redirectUri, scope
           });
           model.saveAuthorizationCode.firstCall.args[1].should.equal(client);
           model.saveAuthorizationCode.firstCall.args[2].should.equal(user);
+          model.saveAuthorizationCode.firstCall.args[3].should.eql({ request });
         });
     });
   });
