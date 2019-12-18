@@ -51,13 +51,15 @@ describe('CodeResponseType', function() {
       return handler.saveAuthorizationCode(request, authorizationCode, expiresAt, scope, client, redirectUri, user)
         .then(function() {
           model.saveAuthorizationCode.callCount.should.equal(1);
-          model.saveAuthorizationCode.firstCall.args.should.have.length(4);
+          model.saveAuthorizationCode.firstCall.args.should.have.length(2);
           model.saveAuthorizationCode.firstCall.args[0].should.eql({
-            authorizationCode, expiresAt, redirectUri, scope
+            code: {
+              authorizationCode, expiresAt, redirectUri, scope
+            },
+            client,
+            user
           });
-          model.saveAuthorizationCode.firstCall.args[1].should.equal(client);
-          model.saveAuthorizationCode.firstCall.args[2].should.equal(user);
-          model.saveAuthorizationCode.firstCall.args[3].should.eql({ request });
+          model.saveAuthorizationCode.firstCall.args[1].should.eql({ request });
         });
     });
   });

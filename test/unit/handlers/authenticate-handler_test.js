@@ -93,7 +93,7 @@ describe('AuthenticateHandler', function() {
         .then(function() {
           model.getAccessToken.callCount.should.equal(1);
           model.getAccessToken.firstCall.args.should.have.length(2);
-          model.getAccessToken.firstCall.args[0].should.equal('foo');
+          model.getAccessToken.firstCall.args[0].should.eql({ accessToken: 'foo' });
           model.getAccessToken.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
@@ -117,9 +117,9 @@ describe('AuthenticateHandler', function() {
       return handler.validateScope(request, 'foo')
         .then(function() {
           model.validateScope.callCount.should.equal(1);
-          model.validateScope.firstCall.args.should.have.length(3);
-          model.validateScope.firstCall.args[0].should.equal('foo', 'bar');
-          model.validateScope.firstCall.args[2].should.eql({ request });
+          model.validateScope.firstCall.args.should.have.length(2);
+          model.validateScope.firstCall.args[0].should.eql({ token: 'foo', scope: 'bar' });
+          model.validateScope.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
     });

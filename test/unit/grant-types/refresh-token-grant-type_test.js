@@ -30,7 +30,7 @@ describe('RefreshTokenGrantType', function() {
         .then(function() {
           model.revokeToken.callCount.should.equal(1);
           model.revokeToken.firstCall.args.should.have.length(2);
-          model.revokeToken.firstCall.args[0].should.equal(token);
+          model.revokeToken.firstCall.args[0].should.eql({ token });
           model.revokeToken.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
@@ -52,7 +52,7 @@ describe('RefreshTokenGrantType', function() {
         .then(function() {
           model.getRefreshToken.callCount.should.equal(1);
           model.getRefreshToken.firstCall.args.should.have.length(2);
-          model.getRefreshToken.firstCall.args[0].should.equal('bar');
+          model.getRefreshToken.firstCall.args[0].should.eql({ refreshToken: 'bar' });
           model.getRefreshToken.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
@@ -74,7 +74,7 @@ describe('RefreshTokenGrantType', function() {
         .then(function() {
           model.revokeToken.callCount.should.equal(1);
           model.revokeToken.firstCall.args.should.have.length(2);
-          model.revokeToken.firstCall.args[0].should.equal(token);
+          model.revokeToken.firstCall.args[0].should.eql({ token });
           model.revokeToken.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
@@ -101,11 +101,13 @@ describe('RefreshTokenGrantType', function() {
       return handler.saveToken(request, user, client, 'foobar')
         .then(function() {
           model.saveToken.callCount.should.equal(1);
-          model.saveToken.firstCall.args.should.have.length(4);
-          model.saveToken.firstCall.args[0].should.eql({ accessToken: 'foo', accessTokenExpiresAt: 'biz', grant: 'refresh_token', refreshToken: 'bar', refreshTokenExpiresAt: 'baz', scope: 'foobar' });
-          model.saveToken.firstCall.args[1].should.equal(client);
-          model.saveToken.firstCall.args[2].should.equal(user);
-          model.saveToken.firstCall.args[3].should.eql({ request });
+          model.saveToken.firstCall.args.should.have.length(2);
+          model.saveToken.firstCall.args[0].should.eql({
+            client,
+            token: { accessToken: 'foo', accessTokenExpiresAt: 'biz', grant: 'refresh_token', refreshToken: 'bar', refreshTokenExpiresAt: 'baz', scope: 'foobar' },
+            user
+          });
+          model.saveToken.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
     });
