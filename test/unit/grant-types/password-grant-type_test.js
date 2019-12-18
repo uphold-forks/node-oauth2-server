@@ -26,10 +26,9 @@ describe('PasswordGrantType', function() {
       return handler.getUser(request)
         .then(function() {
           model.getUser.callCount.should.equal(1);
-          model.getUser.firstCall.args.should.have.length(3);
-          model.getUser.firstCall.args[0].should.equal('foo');
-          model.getUser.firstCall.args[1].should.equal('bar');
-          model.getUser.firstCall.args[2].should.eql({ request });
+          model.getUser.firstCall.args.should.have.length(2);
+          model.getUser.firstCall.args[0].should.eql({ password: 'bar', username: 'foo' });
+          model.getUser.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
     });
@@ -54,11 +53,13 @@ describe('PasswordGrantType', function() {
       return handler.saveToken(request, user, client, 'foobar')
         .then(function() {
           model.saveToken.callCount.should.equal(1);
-          model.saveToken.firstCall.args.should.have.length(4);
-          model.saveToken.firstCall.args[0].should.eql({ accessToken: 'foo', accessTokenExpiresAt: 'biz', grant: 'password', refreshToken: 'bar', refreshTokenExpiresAt: 'baz', scope: 'foobar' });
-          model.saveToken.firstCall.args[1].should.equal(client);
-          model.saveToken.firstCall.args[2].should.equal(user);
-          model.saveToken.firstCall.args[3].should.eql({ request });
+          model.saveToken.firstCall.args.should.have.length(2);
+          model.saveToken.firstCall.args[0].should.eql({
+            client,
+            token: { accessToken: 'foo', accessTokenExpiresAt: 'biz', grant: 'password', refreshToken: 'bar', refreshTokenExpiresAt: 'baz', scope: 'foobar' },
+            user
+          });
+          model.saveToken.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
     });

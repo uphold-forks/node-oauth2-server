@@ -30,7 +30,7 @@ describe('AuthorizeHandler', function() {
         .then(function() {
           model.getClient.callCount.should.equal(1);
           model.getClient.firstCall.args.should.have.length(2);
-          model.getClient.firstCall.args[0].should.equal(12345);
+          model.getClient.firstCall.args[0].should.eql({ clientId: 12345 });
           model.getClient.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
