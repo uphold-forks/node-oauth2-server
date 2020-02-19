@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 
+var InvalidScopeError = require('../../../lib/errors/invalid-scope-error');
 var RefreshTokenGrantType = require('../../../lib/grant-types/refresh-token-grant-type');
 var Request = require('../../../lib/request');
 var sinon = require('sinon');
@@ -110,6 +111,76 @@ describe('RefreshTokenGrantType', function() {
           model.saveToken.firstCall.args[1].should.eql({ request });
         })
         .catch(should.fail);
+    });
+  });
+
+  describe('validateScope()', function () {
+    it('should return token scope if there is no request scope', function () {
+      var model = {
+        getRefreshToken: function () {},
+        revokeToken: function () {},
+        saveToken: function () {},
+      };
+      var handler = new RefreshTokenGrantType({ accessTokenLifetime: 120, model: model });
+      var request = new Request({ body: { refresh_token: 'bar' }, headers: {}, method: {}, query: {} });
+      var token = { scope: 'foo' };
+
+      var scope = handler.validateScope(request, token);
+
+      scope.should.equal('foo');
+    });
+
+    it('should call `model.validateScope()` if there is a request scope', function () {
+      var model = {
+        getRefreshToken: function () {},
+        revokeToken: function () {},
+        saveToken: function () {},
+        validateScope: sinon.stub().returns(true)
+      };
+      var handler = new RefreshTokenGrantType({ accessTokenLifetime: 120, model: model });
+      var request = new Request({ body: { refresh_token: 'bar', scope: 'foo' }, headers: {}, method: {}, query: {} });
+      var token = {};
+
+      handler.validateScope(request, token);
+      
+      model.validateScope.callCount.should.equal(1);
+      model.validateScope.firstCall.args.should.have.length(2);
+      model.validateScope.firstCall.args[0].should.eql({ scope: 'foo', token });
+      model.validateScope.firstCall.args[1].should.eql({ request });
+    });
+
+    it('should throw an error if the request scope is invalid', function () {
+      var model = {
+        getRefreshToken: function () {},
+        revokeToken: function () {},
+        saveToken: function () {},
+        validateScope: sinon.stub().returns(false)
+      };
+      var handler = new RefreshTokenGrantType({ accessTokenLifetime: 120, model: model });
+      var request = new Request({ body: { refresh_token: 'bar', scope: 'biz' }, headers: {}, method: {}, query: {} });
+      var token = { scope: 'foo bar' };
+
+      try {
+        handler.validateScope(request, token);
+      } catch (e) {
+        e.should.be.instanceOf(InvalidScopeError);
+      }
+    });
+
+    it('should return the request scope if the scope is valid', function () {
+      var model = {
+        getRefreshToken: function () {},
+        revokeToken: function () {},
+        saveToken: function () {},
+        validateScope: sinon.stub().returns(true)
+      };
+      var handler = new RefreshTokenGrantType({ accessTokenLifetime: 120, model: model });
+      var request = new Request({ body: { refresh_token: 'bar', scope: 'foo' }, headers: {}, method: {}, query: {} });
+      var token = { scope: 'foo bar' };
+
+      var scope = handler.validateScope(request, token);
+
+      scope.should.equal('foo');
     });
   });
 });
