@@ -134,8 +134,7 @@ describe('AuthorizeHandler integration', function() {
       var response = new Response({ body: {}, headers: {} });
 
       return handler.handle(request, response)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(AccessDeniedError);
           e.message.should.equal('Access denied: user denied access to application');
         });
@@ -354,8 +353,7 @@ describe('AuthorizeHandler integration', function() {
       var response = new Response({ body: {}, headers: {} });
 
       return handler.handle(request, response)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidRequestError);
           e.message.should.equal('Missing parameter: `response_type`');
         });
@@ -394,8 +392,7 @@ describe('AuthorizeHandler integration', function() {
       var response = new Response({ body: {}, headers: {} });
 
       return handler.handle(request, response)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidRequestError);
           e.message.should.equal('Invalid parameter: `response_type`');
         });
@@ -434,10 +431,46 @@ describe('AuthorizeHandler integration', function() {
       var response = new Response({ body: {}, headers: {} });
 
       return handler.handle(request, response)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(UnsupportedResponseType);
           e.message.should.equal('Unsupported response type: `response_type` is invalid');
+        });
+    });
+
+    it('should rethrow errors', function() {
+      var model = {
+        getAccessToken: function() {
+          return { user: {} };
+        },
+        getClient: function() {
+          return { grants: ['authorization_code'], redirectUris: ['http://example.com/cb'] };
+        },
+        saveAuthorizationCode: function() {
+          return {};
+        }
+      };
+      var handler = new AuthorizeHandler({ authorizationCodeLifetime: 120, model: model });
+      var request = new Request({
+        body: {
+          client_id: 12345,
+          grant_type: 'authorization_code',
+          response_type: 'code'
+        },
+        headers: {
+          'Authorization': 'Bearer foo'
+        },
+        method: {},
+        query: {
+          scope: [],
+          state: 'foobar'
+        }
+      });
+      var response = new Response({ body: {}, headers: {} });
+
+      return handler.handle(request, response)
+        .then(should.fail, function(e) {
+          console.log('hi', e)
+          response.get('location').should.equal('http://example.com/cb?error=invalid_scope&error_description=Invalid%20parameter%3A%20%60scope%60');
         });
     });
 
@@ -546,8 +579,7 @@ describe('AuthorizeHandler integration', function() {
       var request = new Request({ body: { client_id: 12345, response_type: 'code' }, headers: {}, method: {}, query: {} });
 
       return handler.getClient(request)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal('Invalid client: client credentials are invalid');
         });
@@ -563,8 +595,7 @@ describe('AuthorizeHandler integration', function() {
       var request = new Request({ body: { client_id: 12345, response_type: 'code' }, headers: {}, method: {}, query: {} });
 
       return handler.getClient(request)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal('Invalid client: client credentials are invalid');
         });
@@ -582,8 +613,7 @@ describe('AuthorizeHandler integration', function() {
       var request = new Request({ body: { client_id: 12345, response_type: 'code' }, headers: {}, method: {}, query: {} });
 
       return handler.getClient(request)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal('Invalid client: missing client `grants`');
         });
@@ -601,8 +631,7 @@ describe('AuthorizeHandler integration', function() {
       var request = new Request({ body: { client_id: 12345, response_type: 'code' }, headers: {}, method: {}, query: {} });
 
       return handler.getClient(request)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal('Invalid client: `grants` must be an array');
         });
@@ -618,8 +647,7 @@ describe('AuthorizeHandler integration', function() {
       var request = new Request({ body: { client_id: 12345, response_type: 'code' }, headers: {}, method: {}, query: {} });
 
       return handler.getClient(request)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal('Invalid client: missing client `redirectUri`');
         });
@@ -637,8 +665,7 @@ describe('AuthorizeHandler integration', function() {
       var request = new Request({ body: { client_id: 12345, response_type: 'code', redirect_uri: 'https://foobar.com' }, headers: {}, method: {}, query: {} });
 
       return handler.getClient(request)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(InvalidClientError);
           e.message.should.equal('Invalid client: `redirect_uri` does not match client value');
         });
@@ -737,8 +764,7 @@ describe('AuthorizeHandler integration', function() {
       var response = new Response();
 
       return handler.getUser(request, response)
-        .then(should.fail)
-        .catch(function(e) {
+        .then(should.fail, function(e) {
           e.should.be.an.instanceOf(ServerError);
           e.message.should.equal('Server error: `handle()` did not return a `user` object');
         });
